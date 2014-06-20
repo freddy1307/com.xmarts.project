@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+  <database name="TRIGGER ADP_TYPECOST_TRG">
+    <trigger name="ADP_TYPECOST_TRG" table="ADP_BUDGET" fires="after" insert="true" update="true" delete="false" foreach="row">
+      <body><![CDATA[TIPOC VARCHAR(10);
+TIPO VARCHAR(100);  
+BUD NUMBER;  
+PROY VARCHAR(35);
+PEX NUMBER;
+TOTAL NUMBER;
+BEGIN
+	IF INSERTING THEN 
+	
+	TIPO := :NEW.TYPE;
+	BUD := :NEW.BUDGET;
+	PROY := :NEW.C_PROJECT_ID;
+	ELSE
+	TIPO := :OLD.TYPE;
+	BUD := :OLD.BUDGET;
+	PROY := :OLD.C_PROJECT_ID;
+	END IF;
+
+	TIPOC := :NEW.TYPECOST;
+	
+	IF TIPO = 'Payment Out' THEN	
+		
+		IF TIPOC = 'PE' THEN
+
+			SELECT EXPEXPENSES INTO PEX
+			FROM C_PROJECT WHERE C_PROJECT_ID = PROY;
+	
+			IF PEX IS NULL THEN 
+			PEX := 0;
+			END IF;
+			
+			TOTAL := PEX + BUD;
+			--RAISE NO_DATA_FOUND||TOTAL;
+			
+			UPDATE C_PROJECT SET EXPEXPENSES = TOTAL
+			WHERE C_PROJECT_ID = PROY;
+		ELSE
+							IF TIPOC = 'SPC' THEN
+							
+								SELECT SERVSERCOST INTO PEX
+								FROM C_PROJECT WHERE C_PROJECT_ID = PROY;
+								
+								IF PEX IS NULL THEN 
+								PEX := 0;
+								END IF;
+								
+								TOTAL := PEX + BUD;
+
+								UPDATE C_PROJECT SET SERVSERCOST = TOTAL
+								WHERE C_PROJECT_ID = PROY;
+							ELSE
+													IF TIPOC = 'SC' THEN
+
+														SELECT SERVOUTCOST INTO PEX
+														FROM C_PROJECT WHERE C_PROJECT_ID = PROY;
+
+														IF PEX IS NULL THEN 
+														PEX := 0;
+														END IF;
+
+														TOTAL := PEX + BUD;
+
+														UPDATE C_PROJECT SET SERVOUTCOST = TOTAL
+														WHERE C_PROJECT_ID = PROY;
+													ELSE
+																			IF TIPOC = 'RE' THEN
+
+																			SELECT EXPREINVOICING INTO PEX
+																			FROM C_PROJECT WHERE C_PROJECT_ID = PROY;
+
+																			IF PEX IS NULL THEN 
+																			PEX := 0;
+																			END IF;
+																			
+																			TOTAL := PEX + BUD;
+
+																			UPDATE C_PROJECT SET EXPREINVOICING = TOTAL
+																			WHERE C_PROJECT_ID = PROY;
+																			
+																			END IF;
+													END IF;
+							END IF;
+		END IF;
+	END IF;
+
+	IF UPDATING THEN RETURN OLD; ELSE RETURN NEW; END IF; 
+END ADP_TYPECOST_TRG
+]]></body>
+    </trigger>
+  </database>
