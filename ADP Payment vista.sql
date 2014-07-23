@@ -1,8 +1,4 @@
-﻿-- View: apm_payment_v
-
--- DROP VIEW apm_payment_v;
-
-CREATE OR REPLACE VIEW adp_payment_v AS 
+﻿CREATE OR REPLACE VIEW adp_payment_v AS 
          SELECT p.fin_payment_schedule_id AS adp_payment_v_id, i.em_adp_budget_id AS adp_budget_id, p.fin_payment_schedule_id, p.ad_client_id, p.ad_org_id, p.created, p.createdby, p.updated, p.updatedby, p.c_invoice_id, p.c_order_id, i.dateinvoiced AS fechafactura, p.duedate, 
          p.fin_paymentmethod_id, p.c_currency_id, p.amount, p.paidamt, p.outstandingamt, p.isactive, ccu.iso_code::character varying(3) AS budgetcurrency, 
                 CASE
